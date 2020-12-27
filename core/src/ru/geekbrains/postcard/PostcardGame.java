@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
 
 public class PostcardGame extends ApplicationAdapter {
 	public static final int WIDTH = 640;
@@ -19,13 +20,32 @@ public class PostcardGame extends ApplicationAdapter {
 	private Moon moon;
 	private Cloud[] clouds;
 	private PolygonSprite[] ground;
-	private Texture houseTexture;
+	private Banner banner;
+	private Santa santa;
+	private Tree tree;
+
+	public class Tree{
+		private Texture treeTexture;
+		private Vector2 position;
+		private float size;
+
+		public Tree(){
+			this.treeTexture = new Texture("good-tree.png");
+			this.position = new Vector2(250, -70);
+			this.size = 500;
+		}
+		public void render(SpriteBatch batch) {
+			batch.draw(treeTexture, position.x, position.y, size, size);
+		}
+
+	}
 	
 	@Override
 	public void create () {
 		this.batch = new SpriteBatch();
 		this.polygonSpriteBatch = new PolygonSpriteBatch();
 		this.threadTexture = new Texture("thread.png");
+		this.banner = new Banner();
 		this.snowflakes = new Snow[333];
 		for (int i = 0; i < snowflakes.length; i++) {
 			snowflakes[i] = new Snow();
@@ -41,6 +61,8 @@ public class PostcardGame extends ApplicationAdapter {
 			generatePolygonSprite(150, 60, 0.7f),
 			generatePolygonSprite(120, 120, 1.0f)
 		};
+		this.santa = new Santa();
+		this.tree = new Tree();
 	}
 
 	@Override
@@ -54,13 +76,20 @@ public class PostcardGame extends ApplicationAdapter {
 		// moon
 		moon.render(batch, threadTexture);
 
+		// banner
+		banner.render(batch);
+
 		// first three layer of earth
 		polygonSpriteBatch.begin();
-		for (int i = 0; i < ground.length - 1; i++) {
+		for (int i = 0; i < ground.length; i++) {
 			ground[i].draw(polygonSpriteBatch);
 		}
 		polygonSpriteBatch.end();
 
+		//
+		santa.render(batch);
+		tree.render(batch);
+		
 		// snowfall
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 		for (int i = 0; i < snowflakes.length; i++) {
@@ -73,9 +102,9 @@ public class PostcardGame extends ApplicationAdapter {
 			clouds[i].render(batch);
 		}
 		// last three layer of earth
-		polygonSpriteBatch.begin();
-		ground[ground.length - 1].draw(polygonSpriteBatch);
-		polygonSpriteBatch.end();
+//		polygonSpriteBatch.begin();
+//		ground[ground.length - 1].draw(polygonSpriteBatch);
+//		polygonSpriteBatch.end();
 
 		batch.end();
 	}
@@ -85,6 +114,7 @@ public class PostcardGame extends ApplicationAdapter {
 			snowflakes[i].update(dt);
 		}
 		moon.update(dt);
+		santa.update(dt);
 		for (int i = 0; i < clouds.length; i++) {
 			clouds[i].update(dt);
 		}
